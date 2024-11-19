@@ -1,0 +1,52 @@
+module tb_traffic_light_controller;
+
+// Testbench signals
+reg clk;              // Testbench clock signal
+reg reset;            // Testbench reset signal
+wire [2:0] north;     // North traffic lights output (R, Y, G)
+wire [2:0] east;      // East traffic lights output (R, Y, G)
+wire [2:0] south;     // South traffic lights output (R, Y, G)
+wire [2:0] west;      // West traffic lights output (R, Y, G)
+wire [6:0] seg;       // 7-segment display output (common cathode)
+wire [3:0] an;        // Anodes for multiplexing between digits
+
+// Instantiate the traffic light controller module
+traffic_light_controller uut (
+    .clk(clk),
+    .reset(reset),
+    .north(north),
+    .east(east),
+    .south(south),
+    .west(west),
+    .seg(seg),
+    .an(an)
+);
+
+// Clock generation (simulating 1-second clock for the countdown)
+initial begin
+    clk = 0;
+    forever #500 clk = ~clk;  // Toggle clock every 500 time units (simulates 1 Hz)
+end
+
+// Test stimulus
+initial begin
+    // Initialize reset
+    reset = 1;
+    #100;  // Hold reset for a short period (100 time units)
+    reset = 0;
+
+    // Run simulation for 200 seconds (real-time simulation of traffic light behavior)
+    #200000;  // 200,000 time units (200 seconds in this simulation)
+
+    // Finish simulation
+    $stop;
+end
+
+// Monitor output values to see the traffic light behavior and countdown display
+initial begin
+    // Monitor the traffic light states and 7-segment display
+    $monitor("Time = %0d | North = %b, East = %b, South = %b, West = %b | An = %b, Seg = %b",
+             $time, north, east, south, west, an, seg);
+end
+
+endmodule
